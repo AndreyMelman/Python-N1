@@ -1,0 +1,48 @@
+import random
+
+
+class Cell:
+    def __init__(self, mine=False):
+        self.mine = mine
+        self.around_mines = 0
+        self.fl_open = False
+
+
+class GamePole:
+    def __init__(self, n, m):
+        self.n = n
+        self.m = m
+        self.pole = [[Cell() for _ in range(n)] for _ in range(n)]
+        self.init()
+
+    def init(self):
+
+        random_mines = random.sample(range(self.n**2), self.m)
+        for mine in random_mines:
+            row = mine // self.n
+            col = mine % self.n
+            self.pole[row][col].mine = True
+
+        for row in range(self.n):
+            for col in range(self.n):
+                if not self.pole[row][col].mine:
+                    self.pole[row][col].around_mines = self.count_mines_around(row, col)
+
+    def count_mines_around(self, row, col):
+        count = 0
+        for i in range(row - 1, row + 2):
+            for j in range(col - 1, col + 2):
+                if 0 <= i < self.n and 0 <= j < self.n and self.pole[i][j].mine:
+                    count += 1
+        return count
+
+    def show(self):
+        for row in self.pole:
+            for cell in row:
+                if not cell.fl_open:
+                    print("#", end=" ")
+                elif cell.mine:
+                    print("*", end=" ")
+                else:
+                    print(cell.around_mines, end=" ")
+            print()
